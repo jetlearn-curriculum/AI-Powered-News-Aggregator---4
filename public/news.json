@@ -1,6 +1,6 @@
 {
   "topic": "Science News",
-  "updatedAt": "2026-11-24T02:48:08.238Z",
+  "updatedAt": "2026-11-24T03:04:08.406Z",
   "articles": [
     {
       "title": "NASA Awards Contract for NOAA’s Near Earth Orbit Network Program",
@@ -35,6 +35,14 @@
       "source": "Space"
     },
     {
+      "title": "NASA’s Webb Shows How Supernova Dust Chronicles Star Evolution",
+      "link": "https://science.nasa.gov/missions/webb/nasas-webb-shows-how-supernova-dust-chronicles-star-evolution/",
+      "published": "2026-11-23T15:00:00.000Z",
+      "snippet": "NASA’s James Webb Space Telescope has painted a vibrant tapestry of the legendary supernova remnant Cassiopeia A (Cas A).  Remnants like these are the clouds of gas and dust that remain following the explosion of a massive star and will eventually seed a...",
+      "summary": null,
+      "source": "Space"
+    },
+    {
       "title": "Scientists Say: Noise",
       "link": "https://www.snexplores.org/article/scientists-say-noise-definition-pronunciation",
       "published": "2026-11-23T11:30:00.000Z",
@@ -49,6 +57,46 @@
       "snippet": "Ancient Egyptians might have linked hamadryas baboons with the moon god Thoth due to their silvery fur.",
       "summary": null,
       "source": "Science"
+    },
+    {
+      "title": "APOD: 2026 November 23 – The Emergence of Dark Nebula Lynds 1251",
+      "link": "https://science.nasa.gov/image-article/apod-2026-november-23-the-emergence-of-dark-nebula-lynds-1251/",
+      "published": "2026-11-23T05:05:00.000Z",
+      "snippet": "APOD Science APOD APOD: 2026 November 23 – The… Today’s APOD Archive Submissions Index Search Calendar RSS Education About Discuss APOD Astronomy Picture of the Day Discover the cosmos!  Each day a different image or photograph of our fascinating universe...",
+      "summary": null,
+      "source": "Space"
+    },
+    {
+      "title": "Laser Focus at the Top of the World",
+      "link": "https://science.nasa.gov/earth/earth-observatory/laser-focus-at-the-top-of-the-world/",
+      "published": "2026-11-23T05:01:00.000Z",
+      "snippet": "A next-generation geodetic instrument developed by NASA, part of a network that helps measure satellites’ orbits and the planet’s shape, has debuted in Svalbard, Norway.",
+      "summary": null,
+      "source": "Space"
+    },
+    {
+      "title": "65 Years of Human Spaceflight at NASA Johnson",
+      "link": "https://www.nasa.gov/centers-and-facilities/johnson/65-years-of-human-spaceflight-at-nasa-johnson/",
+      "published": "2026-11-22T19:13:25.000Z",
+      "snippet": "For 65 years, NASA’s Johnson Space Center in Houston has helped shape human spaceflight, from the Gemini missions that demonstrated rendezvous and docking techniques needed for Apollo to the research conducted aboard the International Space Station, which...",
+      "summary": null,
+      "source": "Space"
+    },
+    {
+      "title": "APOD: 2026 November 22 – Swirls and Colors on Jupiter from Juno",
+      "link": "https://science.nasa.gov/image-article/apod-2026-november-22-swirls-and-colors-on-jupiter-from-juno/",
+      "published": "2026-11-22T05:05:00.000Z",
+      "snippet": "APODScienceAPODAPOD: 2026 November 22 –…Today’s APODArchiveSubmissionsIndexSearchCalendarRSSEducationAboutDiscuss APOD Astronomy Picture of the Day Discover the cosmos!  Each day a different image or photograph of our fascinating universe is featured,...",
+      "summary": null,
+      "source": "Space"
+    },
+    {
+      "title": "APOD: 2026 November 21 – Voyager’s Neptune",
+      "link": "https://science.nasa.gov/image-article/apod-2026-november-21-voyagers-neptune/",
+      "published": "2026-11-21T05:05:00.000Z",
+      "snippet": "APODScienceAPODAPOD: 2026 November 21 –…Today’s APODArchiveSubmissionsIndexSearchCalendarRSSEducationAboutDiscuss APOD Astronomy Picture of the Day Discover the cosmos!  Each day a different image or photograph of our fascinating universe is featured,...",
+      "summary": null,
+      "source": "Space"
     }
   ]
 }
