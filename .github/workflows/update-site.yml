@@ -14,6 +14,7 @@ permissions:
   contents: write   # lets the bot save news.json back to the repo
   pages: write      # lets the bot publish to GitHub Pages
   id-token: write   # required by GitHub Pages
+  actions: read     # lets deploy-pages read uploaded artifact metadata
 
 concurrency:
   group: update-site
@@ -58,6 +59,7 @@ jobs:
           fi
 
       - name: Build the website
+        id: build
         if: ${{ !cancelled() }}
         run: |
           set -euo pipefail
@@ -70,24 +72,27 @@ jobs:
             [ -f "$OUT/news.json" ] || cp public/news.json "$OUT/news.json"
           else
             echo "Publishing the website files as they are."
+            rm -rf _site
             mkdir -p _site
-            tar --exclude=./.git --exclude=./.github --exclude=./_site --exclude=./scripts --exclude=./test --exclude=./node_modules --exclude=./server.js --exclude=./.env* --exclude=./package*.json -cf - . | tar -xf - -C _site
-            cp public/news.json _site/news.json
+            cp -r public/. _site/
+            cp index.html config.json _site/
             OUT=_site
           fi
           echo "SITE_DIR=$OUT" >> "$GITHUB_ENV"
 
       - name: Prepare GitHub Pages
-        if: ${{ !cancelled() }}
+        id: pages
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         uses: actions/configure-pages@v5
 
       - name: Upload the website
-        if: ${{ !cancelled() }}
+        id: upload
+        if: ${{ !cancelled() && steps.pages.outcome == 'success' }}
         uses: actions/upload-pages-artifact@v4
         with:
           path: ${{ env.SITE_DIR }}
 
       - name: Publish the website
-        if: ${{ !cancelled() }}
         id: deployment
+        if: ${{ !cancelled() && steps.upload.outcome == 'success' }}
         uses: actions/deploy-pages@v4
