@@ -1,6 +1,6 @@
 {
   "topic": "Science News",
-  "updatedAt": "2026-11-24T03:04:08.406Z",
+  "updatedAt": "2026-11-24T03:20:03.944Z",
   "articles": [
     {
       "title": "NASA Awards Contract for NOAA’s Near Earth Orbit Network Program",
@@ -31,7 +31,7 @@
       "link": "https://www.nasa.gov/missions/europa-clipper/nasa-documentary-captures-europa-clippers-journey-into-deep-space/",
       "published": "2026-11-23T16:08:23.000Z",
       "snippet": "NASA invites the world behind the scenes to witness the story of Europa Clipper’s journey from a far-off vision to a cutting-edge deep space exploration mission with the release of the agency’s newest documentary, “The Europa Concept.” The documentary will air on NASA+, the NASA app, and the agency’s website starting Monday, Nov. 23, and […]",
-      "summary": null,
+      "summary": "NASA is releasing a new documentary called \"The Europa Concept\" to show the behind-the-scenes story of the Europa Clipper deep space mission. It will air starting Monday, Nov. 23, on NASA+, the NASA app, and NASA's website.",
       "source": "Space"
     },
     {
@@ -39,7 +39,7 @@
       "link": "https://science.nasa.gov/missions/webb/nasas-webb-shows-how-supernova-dust-chronicles-star-evolution/",
       "published": "2026-11-23T15:00:00.000Z",
       "snippet": "NASA’s James Webb Space Telescope has painted a vibrant tapestry of the legendary supernova remnant Cassiopeia A (Cas A).  Remnants like these are the clouds of gas and dust that remain following the explosion of a massive star and will eventually seed a...",
-      "summary": null,
+      "summary": "NASA’s James Webb Space Telescope captured a colorful image of a famous space cloud called Cassiopeia A. This cloud of gas and dust is left behind after a huge star explodes, and its dust helps show how stars change.",
       "source": "Space"
     },
     {
@@ -47,7 +47,7 @@
       "link": "https://www.snexplores.org/article/scientists-say-noise-definition-pronunciation",
       "published": "2026-11-23T11:30:00.000Z",
       "snippet": "To analyze a messy set of data, scientists must distinguish real information from background “noise.”",
-      "summary": null,
+      "summary": "Scientists study messy sets of data. To do this, they must tell the real information apart from background \"noise.\"",
       "source": "Science"
     },
     {
@@ -79,7 +79,7 @@
       "link": "https://www.nasa.gov/centers-and-facilities/johnson/65-years-of-human-spaceflight-at-nasa-johnson/",
       "published": "2026-11-22T19:13:25.000Z",
       "snippet": "For 65 years, NASA’s Johnson Space Center in Houston has helped shape human spaceflight, from the Gemini missions that demonstrated rendezvous and docking techniques needed for Apollo to the research conducted aboard the International Space Station, which...",
-      "summary": null,
+      "summary": "For 65 years, NASA’s Johnson Space Center in Houston has helped shape human spaceflight. Its work includes the Gemini missions that showed meeting and docking skills for Apollo, as well as research on the International Space Station.",
       "source": "Space"
     },
     {
@@ -87,7 +87,7 @@
       "link": "https://science.nasa.gov/image-article/apod-2026-november-22-swirls-and-colors-on-jupiter-from-juno/",
       "published": "2026-11-22T05:05:00.000Z",
       "snippet": "APODScienceAPODAPOD: 2026 November 22 –…Today’s APODArchiveSubmissionsIndexSearchCalendarRSSEducationAboutDiscuss APOD Astronomy Picture of the Day Discover the cosmos!  Each day a different image or photograph of our fascinating universe is featured,...",
-      "summary": null,
+      "summary": "Astronomy Picture of the Day features a different image or photo of our universe each day. Its feature for November 22, 2026, is titled \"Swirls and Colors on Jupiter from Juno.\"",
       "source": "Space"
     },
     {
@@ -95,7 +95,7 @@
       "link": "https://science.nasa.gov/image-article/apod-2026-november-21-voyagers-neptune/",
       "published": "2026-11-21T05:05:00.000Z",
       "snippet": "APODScienceAPODAPOD: 2026 November 21 –…Today’s APODArchiveSubmissionsIndexSearchCalendarRSSEducationAboutDiscuss APOD Astronomy Picture of the Day Discover the cosmos!  Each day a different image or photograph of our fascinating universe is featured,...",
-      "summary": null,
+      "summary": "Astronomy Picture of the Day, or APOD, features a different image of our universe each day to help people discover the cosmos. This page is dated November 21, 2026, and is titled Voyager’s Neptune.",
       "source": "Space"
     }
   ]
