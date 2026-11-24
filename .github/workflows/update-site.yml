@@ -34,6 +34,10 @@ jobs:
         with:
           node-version: 22
 
+      - name: Install dependencies
+        if: hashFiles('package.json') != ''
+        run: npm install --no-audit --no-fund
+
       - name: Fetch the news (and AI summaries)
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -67,7 +71,7 @@ jobs:
           else
             echo "Publishing the website files as they are."
             mkdir -p _site
-            tar --exclude=./.git --exclude=./.github --exclude=./_site --exclude=./scripts --exclude=./test --exclude=./node_modules -cf - . | tar -xf - -C _site
+            tar --exclude=./.git --exclude=./.github --exclude=./_site --exclude=./scripts --exclude=./test --exclude=./node_modules --exclude=./server.js --exclude=./.env* --exclude=./package*.json -cf - . | tar -xf - -C _site
             cp public/news.json _site/news.json
             OUT=_site
           fi
