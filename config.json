@@ -2,11 +2,17 @@
   "topic": "Science News",
   "newsBot": true,
   "sources": [
-    { "name": "Science", "feedUrl": "https://www.snexplores.org/feed" },
-    { "name": "Space", "feedUrl": "https://www.nasa.gov/news-release/feed/" }
+    {
+      "name": "Science",
+      "feedUrl": "https://www.snexplores.org/feed"
+    },
+    {
+      "name": "Space",
+      "feedUrl": "https://www.nasa.gov/news-release/feed/"
+    }
   ],
   "maxArticles": 12,
   "aiSummaries": true,
-  "model": "gemini-3.5-flash-lite",
-  "summaryPrompt": "Summarise this news article in 2 short sentences for a 13-year-old reader. Use only facts that are in the text below. If the text is too short to summarise, repeat its main point in one sentence. Plain text only: no headings, no bullet points, no emojis."
+  "model": "gemini-4-hydrogen",
+  "summaryPrompt": "Summarise this news article in 2 short, clear sentences for a 10-14 year old reader. Use simple everyday words, keep it strictly kid-safe, and use only facts in the text below. Plain text only: no headings, no bullet points, no emojis."
 }

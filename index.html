@@ -182,25 +182,41 @@
            saving. The "Why two steps" line below is part of the lesson, not an
            apology: it is the reason the next project moves to a platform that
            can run code and keep a secret. -->
-      <div id="add-source-panel" class="hidden mt-3 p-4 rounded-xl border border-slate-200 bg-slate-50">
-        <label for="add-source-input" class="block text-xs font-bold text-slate-700 mb-2">
-          Paste a news website address
-        </label>
+      <div id="add-source-panel" class="hidden mt-3 p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+          <label for="add-source-input" class="block text-xs font-bold text-slate-700">
+            Paste a news website address
+          </label>
+          <span id="add-source-count" class="text-[11px] font-semibold text-slate-400"></span>
+        </div>
         <div class="flex flex-col sm:flex-row gap-2">
           <input id="add-source-input" type="url" inputmode="url" autocomplete="off"
-                 placeholder="https://www.nasa.gov"
-                 class="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                 placeholder="https://www.sciencedaily.com"
+                 class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
           <button id="add-source-send" type="button"
-                  class="px-4 py-2 rounded-lg text-sm font-bold bg-sky-600 text-white hover:bg-sky-700 transition-all whitespace-nowrap">
+                  class="px-4 py-2 rounded-lg text-sm font-bold bg-sky-600 text-white hover:bg-sky-700 disabled:opacity-60 transition-all whitespace-nowrap">
             Add it
           </button>
         </div>
         <p id="add-source-note" class="mt-2 text-xs text-slate-500 leading-relaxed">
-          This takes two steps. Press <span class="font-semibold text-slate-700">Add it</span>,
-          then press the green button on the page that opens.
+          Paste any news website or RSS feed address. We will find its feed and load its latest stories right away.
         </p>
 
-        <details class="mt-3 group">
+        <div id="active-sources-section" class="hidden mt-4 pt-3 border-t border-slate-100">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <span class="text-xs font-bold text-slate-700">Active websites</span>
+            <button id="refresh-stories-btn" type="button"
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200/80 disabled:opacity-60 transition-colors">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>Refresh stories</span>
+            </button>
+          </div>
+          <div id="active-sources-list" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <details id="two-step-details" class="mt-3 group hidden">
           <summary class="text-xs text-slate-400 hover:text-slate-600 cursor-pointer select-none">
             Why two steps?
           </summary>
@@ -450,49 +466,57 @@
     function buildSourceButtons(articles) {
       const bar = document.getElementById('source-filters');
       if (!bar) return;
+
       const names = [];
       for (const a of articles) {
         if (a.source && !names.includes(a.source)) names.push(a.source);
       }
+
+      if (currentFilter !== 'all' && !names.includes(currentFilter)) {
+        currentFilter = 'all';
+      }
+
+      bar.innerHTML = '';
+      const allBtn = document.createElement('button');
+      allBtn.setAttribute('data-filter', 'all');
+      allBtn.className = currentFilter === 'all'
+        ? 'filter-btn active-filter px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap bg-sky-600 text-white shadow-sm'
+        : 'filter-btn px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200';
+      allBtn.textContent = 'All Stories';
+      bar.appendChild(allBtn);
+
       if (names.length < 2) return; // one website only: nothing to choose between
       for (const name of names) {
         const btn = document.createElement('button');
         btn.setAttribute('data-filter', name);
-        btn.className = 'filter-btn px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200';
+        btn.className = currentFilter === name
+          ? 'filter-btn active-filter px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap bg-sky-600 text-white shadow-sm'
+          : 'filter-btn px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap bg-white text-slate-700 hover:bg-slate-100 border border-slate-200';
         btn.textContent = name;
         bar.appendChild(btn);
       }
     }
 
     // ---------- Add a news website ----------
-    //
-    // This page is just files, so it cannot save anything by itself. What it
-    // can do is send the address to the robot that looks after the site. The
-    // robot finds the feed, checks it works, and writes it into config.json.
-    //
-    // The page works out where to send it from its own address. A published
-    // site sits at https://NAME.github.io/REPO/ , so the robot that looks
-    // after it is at github.com/NAME/REPO. Nothing to fill in by hand, and it
-    // is correct in every learner's copy.
     function setUpAddSource() {
       const toggle = document.getElementById('add-source-toggle');
       const panel = document.getElementById('add-source-panel');
       const input = document.getElementById('add-source-input');
       const send = document.getElementById('add-source-send');
       const note = document.getElementById('add-source-note');
+      const countEl = document.getElementById('add-source-count');
+      const activeSection = document.getElementById('active-sources-section');
+      const activeList = document.getElementById('active-sources-list');
+      const refreshBtn = document.getElementById('refresh-stories-btn');
+      const twoStepDetails = document.getElementById('two-step-details');
       if (!toggle || !panel || !input || !send || !note) return;
 
+      const isGitHubPages = location.hostname.endsWith('github.io');
       const owner = location.hostname.replace('.github.io', '');
       const repo = location.pathname.split('/').filter(Boolean)[0];
-      if (!location.hostname.endsWith('github.io') || !owner || !repo) {
-        toggle.remove(); // opened from a file: there is no site to add to
-        panel.remove();
-        return;
-      }
 
-      // The line under the box changes as things happen: the two step
-      // instructions to start with, then red if something is wrong, then green
-      // once it has been sent. Keep the original so it can come back.
+      // The line under the box changes as things happen: instructions to start with,
+      // then red if something is wrong, then green once added. Keep the original so it can come back.
       const noteDefault = { html: note.innerHTML, className: note.className };
       const setNote = (html, colour) => {
         note.innerHTML = html;
@@ -503,10 +527,109 @@
         note.className = noteDefault.className;
       };
 
+      function escapeHtml(s) {
+        const d = document.createElement('div');
+        d.textContent = String(s);
+        return d.innerHTML;
+      }
+
+      async function loadActiveSources() {
+        if (isGitHubPages || !activeSection || !activeList) return;
+        try {
+          const res = await fetch('./api/sources', { cache: 'no-store' });
+          if (!res.ok) return;
+          const data = await res.json();
+          const sources = Array.isArray(data.sources) ? data.sources : [];
+          const maxSources = data.maxSources || 8;
+
+          if (countEl) {
+            countEl.textContent = `${sources.length} of ${maxSources} websites`;
+          }
+
+          activeList.innerHTML = '';
+          if (sources.length === 0) {
+            activeSection.classList.add('hidden');
+            return;
+          }
+          activeSection.classList.remove('hidden');
+
+          for (const src of sources) {
+            const chip = document.createElement('div');
+            chip.className = 'inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700';
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'font-semibold';
+            nameSpan.textContent = src.name;
+            nameSpan.title = src.feedUrl;
+            chip.appendChild(nameSpan);
+
+            if (sources.length > 1) {
+              const removeBtn = document.createElement('button');
+              removeBtn.type = 'button';
+              removeBtn.title = `Remove ${src.name}`;
+              removeBtn.className = 'w-4 h-4 rounded flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors font-bold';
+              removeBtn.textContent = '×';
+              removeBtn.addEventListener('click', () => removeSource(src));
+              chip.appendChild(removeBtn);
+            }
+
+            activeList.appendChild(chip);
+          }
+        } catch {
+          /* ignore if server endpoint unavailable */
+        }
+      }
+
+      async function removeSource(src) {
+        setNote(`Removing ${escapeHtml(src.name)}...`, 'text-slate-500');
+        try {
+          const res = await fetch('./api/sources', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ feedUrl: src.feedUrl }),
+          });
+          const result = await res.json();
+          if (!res.ok || result.error) throw new Error(result.error || 'Could not remove that website.');
+
+          setNote(`Removed <span class="font-bold">${escapeHtml(src.name)}</span>.`, 'text-emerald-700');
+          await loadActiveSources();
+          fetchNews();
+        } catch (err) {
+          setNote(escapeHtml(err.message || 'Could not remove that website.'), 'text-rose-600 font-semibold');
+        }
+      }
+
+      if (refreshBtn && !isGitHubPages) {
+        refreshBtn.addEventListener('click', async () => {
+          refreshBtn.disabled = true;
+          const labelSpan = refreshBtn.querySelector('span');
+          if (labelSpan) labelSpan.textContent = 'Refreshing...';
+          setNote('Checking all active websites for new stories...', 'text-slate-500');
+          try {
+            const res = await fetch('./api/refresh', { method: 'POST' });
+            const result = await res.json();
+            if (!res.ok || result.error) throw new Error(result.error || 'Could not refresh stories.');
+            const parts = [`Loaded <span class="font-bold">${result.count}</span> stories across your websites.`];
+            if (result.aiApplied) parts.push('Reading level adapted for ages 10–14.');
+            if (result.filteredCount > 0) parts.push(`Filtered ${result.filteredCount} mature story(ies).`);
+            if (result.aiError) parts.push(escapeHtml(result.aiError));
+            else if (result.aiNotice) parts.push(escapeHtml(result.aiNotice));
+            setNote(parts.join(' '), result.aiError ? 'text-amber-700' : 'text-emerald-700');
+            fetchNews();
+          } catch (err) {
+            setNote(escapeHtml(err.message || 'Could not refresh stories.'), 'text-rose-600 font-semibold');
+          } finally {
+            refreshBtn.disabled = false;
+            if (labelSpan) labelSpan.textContent = 'Refresh stories';
+          }
+        });
+      }
+
       toggle.addEventListener('click', () => {
         panel.classList.toggle('hidden');
         if (!panel.classList.contains('hidden')) {
           resetNote();
+          loadActiveSources();
           input.focus();
         }
       });
@@ -514,22 +637,30 @@
       // Typing again means they are having another go, so clear the last message.
       input.addEventListener('input', resetNote);
 
-      // Is there a helper set up? config.json says. With one, the whole job
-      // happens here and nobody leaves the page. Without one, the box falls
-      // back to asking the owner to confirm on GitHub, which still works.
-      // See worker/README.md for what the helper is and how to put one up.
       let helperUrl = '';
-      fetch('./config.json', { cache: 'no-store' })
-        .then((r) => r.ok ? r.json() : null)
-        .then((cfg) => {
-          helperUrl = (cfg && cfg.addSourceHelper) || '';
-          if (helperUrl) {
-            noteDefault.html = 'Paste the ordinary address of a news website. '
-              + 'The robot works out the rest.';
-            resetNote();
-          }
-        })
-        .catch(() => { /* no helper, keep the two step wording */ });
+      if (isGitHubPages) {
+        if (!owner || !repo) {
+          toggle.remove();
+          panel.remove();
+          return;
+        }
+        noteDefault.html = 'This takes two steps. Press <span class="font-semibold text-slate-700">Add it</span>, then press the green button on the page that opens.';
+        resetNote();
+        if (twoStepDetails) twoStepDetails.classList.remove('hidden');
+
+        fetch('./config.json', { cache: 'no-store' })
+          .then((r) => r.ok ? r.json() : null)
+          .then((cfg) => {
+            helperUrl = (cfg && cfg.addSourceHelper) || '';
+            if (helperUrl) {
+              noteDefault.html = 'Paste the ordinary address of a news website. The robot works out the rest.';
+              resetNote();
+            }
+          })
+          .catch(() => { /* no helper, keep the two step wording */ });
+      } else {
+        loadActiveSources();
+      }
 
       const submit = () => {
         let address = input.value.trim();
@@ -539,25 +670,24 @@
         }
         if (!/^https?:\/\//i.test(address)) address = 'https://' + address;
 
-        // A real web address has a name like news.example.com: letters,
-        // numbers and dashes, with at least one dot in it. Browsers are
-        // surprisingly happy to accept nonsense here, so this checks properly
-        // rather than trusting the browser.
         let host = '';
         try {
           host = new URL(address).hostname;
         } catch { /* handled just below */ }
         const looksReal = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i.test(host);
         if (!looksReal) {
-          setNote('That does not look like a web address. It should look like www.nasa.gov',
+          setNote('That does not look like a web address. It should look like www.sciencedaily.com',
                   'text-rose-600 font-semibold');
+          return;
+        }
+
+        if (!isGitHubPages) {
+          addViaServer(address);
           return;
         }
 
         if (helperUrl) { askHelper(address); return; }
 
-        // No helper set up, so fall back to asking the owner to confirm on
-        // GitHub. Slower, but it needs nothing to be running anywhere.
         const title = encodeURIComponent('Add news website: ' + address);
         const body = encodeURIComponent(
           'Sent from the Add a news website box.\n\n' +
@@ -577,9 +707,40 @@
         );
       };
 
-      // With a helper, the page does the whole thing itself. It asks the
-      // helper, the helper finds the feed and saves it, and the answer comes
-      // straight back here.
+      async function addViaServer(address) {
+        send.disabled = true;
+        send.textContent = 'Checking...';
+        setNote('Looking for a news feed at that address and fetching stories...', 'text-slate-500');
+
+        try {
+          const res = await fetch('./api/sources', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ address }),
+          });
+          const result = await res.json();
+          if (!res.ok || result.error) throw new Error(result.error || 'That did not work.');
+
+          input.value = '';
+          const parts = [
+            `<span class="font-bold">Added ${escapeHtml(result.name)}!</span>`,
+            `Loaded ${result.stories} kid-safe stories.`,
+          ];
+          if (result.aiApplied) parts.push('Rewritten for ages 10–14.');
+          if (result.filteredCount > 0) parts.push(`Filtered ${result.filteredCount} mature story(ies).`);
+          if (result.aiError) parts.push(escapeHtml(result.aiError));
+          else if (result.aiNotice) parts.push(escapeHtml(result.aiNotice));
+          setNote(parts.join(' '), result.aiError ? 'text-amber-700' : 'text-emerald-700');
+          await loadActiveSources();
+          fetchNews();
+        } catch (err) {
+          setNote(escapeHtml(err.message || 'That did not work.'), 'text-rose-600 font-semibold');
+        } finally {
+          send.disabled = false;
+          send.textContent = 'Add it';
+        }
+      }
+
       async function askHelper(address) {
         send.disabled = true;
         send.textContent = 'Checking...';
@@ -607,14 +768,6 @@
           send.disabled = false;
           send.textContent = 'Add it';
         }
-      }
-
-      // The helper's reply is text from somewhere else, so never drop it
-      // straight into the page as it is.
-      function escapeHtml(s) {
-        const d = document.createElement('div');
-        d.textContent = String(s);
-        return d.innerHTML;
       }
 
       send.addEventListener('click', submit);
@@ -804,11 +957,6 @@
           errorMessage.textContent = err.message || 'Could not load news.json';
           updatedEl.textContent = 'Could not load updates';
         });
-
-      // Outside the news request on purpose: a learner whose news failed to
-      // load still needs the box, because a broken website is exactly when
-      // they want to add a different one.
-      setUpAddSource();
     }
 
     // Website filter clicks. The listener sits on the row rather than on each
@@ -868,6 +1016,7 @@
     retryBtn.addEventListener('click', fetchNews);
 
     // Initial load
+    setUpAddSource();
     fetchNews();
   </script>
 </body>

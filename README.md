@@ -1,82 +1,80 @@
-# AI Architects · Project 4: Teach it memory (checkpoint)
+# AI Architects · Science News Aggregator
 
-Finished state of Projects 1-4. Two things are working here:
+A clean, kid-friendly news aggregator with RSS/Atom feed discovery, optional Gemini AI summaries, source filtering, keyword search, and read-aloud support.
 
-- **Memory.** The bot remembers which stories it has already saved (`alreadySaved` in `scripts/update-news.mjs`), so nothing repeats.
-- **Your own choice of websites.** The websites the bot reads live in `config.json`, not inside the bot. Add a link there and the bot starts pulling from it. The website grows a button for each one.
+## Key Features
 
-Use this repo as the catch-up checkpoint for anyone who fell behind.
+- **In-app website manager:** Any visitor can click **+ Add a news website**, paste a website URL or RSS/Atom feed link, and immediately load its latest stories without editing files or leaving the page.
+- **Smart feed discovery:** Automatically strips tracking parameters, checks section-aware feed paths (e.g. `/india`), inspects HTML pages for RSS/Atom links, checks official RSS mirrors (such as FeedBurner for sites like NDTV or BBC), and falls back to Google News site-search RSS when a site blocks direct scraping or has no built-in RSS endpoint.
+- **Manage & refresh sources:** View active websites (up to 8), remove sources with one click, and click **Refresh stories** to pull fresh articles on demand.
+- **Memory & deduplication:** Remembers previously saved stories (`sameStory` / `alreadySaved` in `scripts/update-news.mjs`) so duplicate links with different tracking query parameters are never added twice.
+- **Optional AI summaries:** Uses Gemini (`config.json` + `GEMINI_API_KEY`) to summarize new articles in 2 short sentences for young readers, falling back gracefully to feed snippets when no API key is configured.
 
-**Needs a secret:** `GEMINI_API_KEY` under Settings > Secrets and variables > Actions.
-
-## How this repo works
+## How This Repo Works
 
 | File | What it does |
 | --- | --- |
-| `index.html` | The website. AI Studio replaces this with its own design; this plain version is the backup. |
-| `public/news.json` | The news the website shows. The bot rewrites it; never edit it by hand once the bot is on. |
-| `config.json` | The settings learners change: topic, the list of websites to pull from, AI on or off, the summary prompt. |
-| `scripts/update-news.mjs` | The news bot. Reads the feed, asks Gemini for summaries, saves `news.json`. |
-| `.github/workflows/update-site.yml` | The timer. GitHub Actions runs the bot, then publishes the site to GitHub Pages. |
-| `scripts/add-source.mjs` | Answers the Add a news website box. Finds the feed, checks it, writes it into `config.json`. |
-| `.github/workflows/add-source.yml` | Runs that script whenever someone uses the box. |
+| `server.js` | Express server (port `3000`) serving the site and providing `/api/sources` and `/api/refresh` endpoints. |
+| `index.html` | The frontend UI: topic filters, search, read-aloud toggle, large-text toggle, and the **+ Add a news website** panel. |
+| `config.json` | Settings and active `sources` list (`name` and `feedUrl`), topic title, `maxArticles`, and Gemini summary prompt. |
+| `public/news.json` | Stored articles and `updatedAt` timestamp displayed by the website. |
+| `scripts/add-source.mjs` | Validates public URLs, discovers RSS/Atom feeds (including section feeds, official mirrors, and fallbacks), and updates `config.json`. |
+| `scripts/update-news.mjs` | Fetches configured feeds, deduplicates stories, generates optional Gemini AI summaries, and writes `public/news.json`. |
+| `.github/workflows/` | Optional GitHub Actions workflows for scheduled news updates and GitHub Pages publishing. |
+| `worker/` | Optional Cloudflare Worker helper for static GitHub Pages deployments. |
 
-## One-time setup for a new copy
+## Running Locally
 
-1. Keep the repository **Public** (free Actions and Pages need it).
-2. Settings > Pages > Build and deployment > Source: **GitHub Actions**.
-3. Actions tab > "Update and publish site" > **Run workflow**. Wait for the green tick.
-4. The site address appears on the run page and in Settings > Pages.
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. *(Optional)* Create a `.env` file (see `.env.example`) and set `GEMINI_API_KEY` if you want server-side AI summaries when adding or refreshing feeds:
+   ```bash
+   GEMINI_API_KEY=your_api_key_here
+   ```
+3. Start the server on port `3000`:
+   ```bash
+   npm run dev
+   ```
+4. Open `http://localhost:3000` in your browser.
 
-## Choose which websites to pull from
+## Adding & Managing News Websites
 
-**The easy way, from your own site.** Press **Add a news website** next to the filter buttons, paste the ordinary address of a news site, and press **Add it**. This takes two steps: a page opens asking you to confirm, and you press the green button on it. Within a few minutes the website appears on your site as a new filter button.
+### From the UI (Recommended)
 
-### Why it takes two steps
+1. Click **`+ Add a news website`** next to the filter buttons.
+2. Paste any website address (for example `https://www.ndtv.com/india`, `https://www.sciencedaily.com`, or a direct RSS/Atom URL) and click **Add it**.
+3. The server discovers the feed, updates `config.json`, fetches the latest stories into `public/news.json`, and adds a new filter button right away.
+4. Inside the same panel, you can:
+   - View **Active websites** (up to 8 sources)
+   - Click **`×`** on a website chip to remove it (at least 1 source must remain)
+   - Click **`Refresh stories`** to fetch the latest articles across all active websites
 
-This is worth understanding, because it explains something about every website you have ever used.
+> **Note:** On ephemeral container environments, edits to `config.json` and `public/news.json` persist for the running session. When deployed as a static site on GitHub Pages, the button automatically falls back to the two-step GitHub Issue / Cloudflare Worker flow.
 
-Your site is only files sitting on a server. Files cannot change themselves. So when you type a new website into that box, the page has no way to save it, because saving means changing a file in your project and nothing on the page is allowed to do that.
+### Manually via `config.json`
 
-It could not be allowed to, either. Changing your project needs a password, and anything the page knows is something every visitor can read. A page that could save things by itself would be a page handing out your password.
-
-So the second step is where your own login does the saving. After that a robot takes over: it finds the news feed, checks it really works, and writes it into `config.json` for you.
-
-To let a page save things without that second step, you need somewhere that can run code and keep a secret. That is what the next project is built on.
-
-**You can have that here too, if you want it.** `worker/` holds a small helper you can put up in about fifteen minutes, for free. It holds the password, so the box does the whole job on the page and the second step disappears. `worker/README.md` explains what it is and how to set it up. Without it everything still works, just with the confirm step.
-
-You do not need the feed address. Paste `www.nasa.gov` and the robot finds the feed behind it, checks it works, and names the button from the feed itself. If a site has no feed, it says so and nothing changes.
-
-Only the owner of a copy can add websites to it. A visitor pressing the button cannot change your site.
-
-**The other way, by hand.** Open `config.json`. The `sources` list is the control panel. Every website in it gets read on every run.
+You can also edit the `sources` array in `config.json` directly:
 
 ```json
 "sources": [
   { "name": "Science", "feedUrl": "https://www.snexplores.org/feed" },
-  { "name": "Space",   "feedUrl": "https://www.nasa.gov/news-release/feed/" }
+  { "name": "Space", "feedUrl": "https://www.nasa.gov/news-release/feed/" }
 ]
 ```
 
-To add a website, add one more line to the list. `name` is the label that appears on the button. Save the file and the bot picks it up on its next run, or press **Run workflow** on the Actions tab to see it straight away.
+Then click **Refresh stories** in the UI or run:
 
-Two things worth knowing:
+```bash
+node scripts/update-news.mjs
+```
 
-- Buttons for choosing a website only appear once there are two or more in the list. With one, there is nothing to choose between.
-- If one website is down or the address is wrong, the bot writes a warning, skips it, and carries on with the rest. It does not stop.
+### Example Feed URLs
 
-### Addresses that work (checked 31 Oct 2026)
-
-These are feed addresses, which are not the same as the address you see in your browser. Pick from this list rather than pasting a website address.
-
-| Topic | feedUrl |
+| Topic | URL / Feed |
 | --- | --- |
-| Science (written for ages 10-14) | https://www.snexplores.org/feed |
-| Space | https://www.nasa.gov/news-release/feed/ |
-| Tech and startups (teacher check for suitability) | https://techcrunch.com/feed/ |
-
-Older copies of this project had a single `feedUrl` setting instead of a `sources` list. Those still work, so nothing breaks for a learner who has not updated yet.
-
-Part of the JetLearn **AI Architects** course, Projects 1-4.
-
+| Science (written for ages 10–14) | `https://www.snexplores.org/feed` |
+| Space (NASA) | `https://www.nasa.gov/news-release/feed/` |
+| NDTV India | `https://www.ndtv.com/india` (resolves to `https://feeds.feedburner.com/ndtvnews-india-news`) |
+| TechCrunch | `https://techcrunch.com/feed/` |

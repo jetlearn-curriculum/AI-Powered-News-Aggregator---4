@@ -7,6 +7,7 @@
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { dirname } from 'node:path';
+import { summariseSingleArticle, isKidSafeBasic, cleanSnippetForKids } from './reading-level.mjs';
 
 const CONFIG_PATH = process.env.CONFIG_PATH || 'config.json';
 const NEWS_PATH = process.env.NEWS_PATH || 'public/news.json';
@@ -29,7 +30,7 @@ let problems = 0;
 //     .../penguins          and     .../penguins?utm_source=rss
 // Cutting off everything after ? or # makes both look the same, so the
 // bot spots them as one story.
-function sameStory(link) {
+export function sameStory(link) {
   try {
     const tidy = new URL(link);
     tidy.search = '';
@@ -51,20 +52,23 @@ function alreadySaved(article, savedLinks) {
 //     { "name": "Space", "feedUrl": "https://www.nasa.gov/news-release/feed/" }
 //   ]
 // Older copies of this project had a single "feedUrl" instead. That still works.
-function sourcesFromConfig() {
-  if (Array.isArray(config.sources) && config.sources.length) {
-    return config.sources
+export function sourcesFromConfig(cfg = config) {
+  if (Array.isArray(cfg.sources) && cfg.sources.length) {
+    return cfg.sources
       .filter((s) => s && s.feedUrl)
       .map((s, i) => ({ name: s.name || `Source ${i + 1}`, feedUrl: s.feedUrl }));
   }
-  if (config.feedUrl) return [{ name: config.topic || 'News', feedUrl: config.feedUrl }];
+  if (cfg.feedUrl) return [{ name: cfg.topic || 'News', feedUrl: cfg.feedUrl }];
   return [];
 }
 
-async function getFeedText(feedUrl) {
+export async function getFeedText(feedUrl) {
   if (FEED_FILE) return readFile(FEED_FILE, 'utf8');
   const res = await fetch(feedUrl, {
-    headers: { 'user-agent': 'ai-architects-news-bot' },
+    headers: {
+      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+      'accept': 'application/rss+xml, application/atom+xml, application/xml, text/xml, */*;q=0.8',
+    },
     signal: AbortSignal.timeout(20000),
   });
   if (!res.ok) throw new Error(`The feed answered with error ${res.status}. Check the address in config.json.`);
@@ -101,7 +105,7 @@ function linkOf(block) {
   return atom ? atom[1].replace(/&amp;/g, '&') : '';
 }
 
-function parseFeed(xml) {
+export function parseFeed(xml) {
   const blocks = xml.match(/<item[\s>][\s\S]*?<\/item>/gi) || xml.match(/<entry[\s>][\s\S]*?<\/entry>/gi) || [];
   return blocks.map((block) => {
     const rawDate = clean(firstTag(block, ['pubDate', 'published', 'updated', 'dc:date']));
@@ -118,21 +122,8 @@ function parseFeed(xml) {
 }
 
 // ---------- 2. Ask Gemini for a summary ----------
-async function summarise(article) {
-  const res = await fetch(`${GEMINI_URL}/${config.model}:generateContent`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY },
-    body: JSON.stringify({
-      contents: [{ role: 'user', parts: [{ text: `${config.summaryPrompt}\n\nTitle: ${article.title}\nText: ${article.snippet || article.title}` }] }],
-    }),
-    signal: AbortSignal.timeout(30000),
-  });
-  if (!res.ok) throw new Error(`Gemini answered with error ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  const data = await res.json();
-  const text = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text || '').join(' ');
-  const tidy = text.replace(/^#+\s.*$/gm, '').replace(/[*_`#]/g, '').replace(/\s+/g, ' ').trim();
-  if (!tidy) throw new Error('Gemini sent back an empty answer.');
-  return tidy;
+export async function summarise(article, cfg = config) {
+  return summariseSingleArticle(article, cfg);
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -195,8 +186,10 @@ async function main() {
   // twice on the website.
   const newOnes = [];
   for (const article of fresh) {
+    if (!isKidSafeBasic(article)) continue;
     if (alreadySaved(article, savedLinks)) continue;
     savedLinks.add(sameStory(article.link));
+    article.snippet = cleanSnippetForKids(article.snippet);
     newOnes.push(article);
   }
   console.log(`${fresh.length} articles across ${sources.length - broken.length} website(s). ${newOnes.length} counted as new.`);
@@ -236,4 +229,6 @@ async function main() {
   if (problems) process.exit(1); // red X in GitHub, but the site still gets the articles
 }
 
-await main();
+if (import.meta.url === `file://${process.argv[1]}`) {
+  await main();
+}
