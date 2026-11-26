@@ -1,7 +1,15 @@
 {
   "topic": "Science News",
-  "updatedAt": "2026-11-25T19:22:28.060Z",
+  "updatedAt": "2026-11-26T03:38:53.210Z",
   "articles": [
+    {
+      "title": "NASA Enhances Supplier Program, Announces Mentor-Protégé Agreement",
+      "link": "https://www.nasa.gov/organizations/osbp/nasa-enhances-supplier-program-announces-mentor-protege-agreement/",
+      "published": "2026-11-25T19:06:56.000Z",
+      "snippet": "How NASA works with small businesses is evolving, and as a result, the agency is strengthening the domestic aerospace industrial base to support future exploration missions through its recently renamed Small Business Supplier Development Program. As part...",
+      "summary": null,
+      "source": "Space"
+    },
     {
       "title": "NASA Eyes Crop Candidates for Future Menus",
       "link": "https://science.nasa.gov/directorates/smd/nasa-eyes-crop-candidates-for-future-menus/",
@@ -15,7 +23,7 @@
       "link": "https://www.nasa.gov/centers-and-facilities/goddard/childhood-career-come-full-circle-for-budget-analyst-at-nasa-goddard/",
       "published": "2026-11-25T16:47:29.000Z",
       "snippet": "Conversations about NASA were the norm around the dinner table during Ashley Knight’s childhood.  Her parents worked at NASA’s Goddard Space Flight Center in Greenbelt, Maryland, and discussions about happenings at the agency continued even when they came...",
-      "summary": null,
+      "summary": "When Ashley Knight was a kid, her parents worked at NASA’s Goddard Space Flight Center in Greenbelt, Maryland, and talked about NASA at the dinner table. Now, Ashley works at NASA Goddard as a budget analyst.",
       "source": "Space"
     },
     {
@@ -31,7 +39,7 @@
       "link": "https://science.nasa.gov/missions/hubble/nasas-hubble-views-ocean-of-stars-in-groundwork-for-roman/",
       "published": "2026-11-25T14:56:54.000Z",
       "snippet": "These Hubble observations are part of a survey that will help researchers better interpret upcoming Nancy Grace Roman Space Telescope observations as they seek to characterize the stars and search for exoplanets in this busy region of our galaxy.",
-      "summary": null,
+      "summary": "NASA’s Hubble viewed an ocean of stars in a busy part of our galaxy. This survey will help researchers understand upcoming Nancy Grace Roman Space Telescope observations as they study the stars and search for exoplanets.",
       "source": "Space"
     },
     {
@@ -39,7 +47,7 @@
       "link": "https://www.snexplores.org/article/insects-had-24-legs",
       "published": "2026-11-25T11:30:00.000Z",
       "snippet": "A many-legged creature from long ago helps fill a major gap in the fossil record — and hints at how today’s insects ended up with just six legs.",
-      "summary": null,
+      "summary": "Insects once had 24 legs, and a many-legged creature from long ago helps fill a big gap in the fossil record. It also hints at how today’s insects ended up with just six legs.",
       "source": "Science"
     },
     {
@@ -88,14 +96,6 @@
       "published": "2026-11-24T19:09:16.000Z",
       "snippet": "NASA’s Northrop Grumman Commercial Resupply Services 25 mission, or Northrop Grumman CRS-25, will deliver about 11,000 pounds of science and supplies to the International Space Station.  The mission will be the third flight of the company’s Cygnus XL, the...",
       "summary": "NASA’s Northrop Grumman CRS-25 mission will deliver about 11,000 pounds of science and supplies to the International Space Station. This mission will be the third flight of Northrop Grumman’s Cygnus XL.",
-      "source": "Space"
-    },
-    {
-      "title": "AGU Hyperwall Schedule",
-      "link": "https://science.nasa.gov/earth/agu-hyperwall-schedule/",
-      "published": "2026-11-24T18:55:42.000Z",
-      "snippet": "American Geophysical Union (AGU) 2026 Join NASA in the Exhibit Hall (Booth #525) for Hyperwall Storytelling by NASA experts.  Full Hyperwall Agenda below.",
-      "summary": "Join NASA experts for Hyperwall Storytelling at American Geophysical Union 2026. They will be in the Exhibit Hall at Booth 525, and the full Hyperwall schedule is below.",
       "source": "Space"
     }
   ]
